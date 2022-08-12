@@ -76,6 +76,8 @@ def inference_pipeline(image, username, module_shape=None, img_type='module', mo
             # Modify to handle error differently.
             print(model_output.text)
             return
+
+    # Above is all you need for the request. Below is combining everything for print and display.
     
     if img_type == 'module':
         total_defective_area = np.zeros(4)
