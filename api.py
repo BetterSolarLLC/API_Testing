@@ -9,7 +9,7 @@ import matplotlib
 
 
 # Fill in with current API_IP.
-API_IP = 'http://192.168.0.22:8080'
+API_IP = ''
 
 # Set colors for custom colormap for image visualizations.
 COLOR_LIST = [(0.001462, 0.000466, 0.013866, 1.0),
@@ -67,6 +67,8 @@ def inference_pipeline(image, username, module_shape=None, img_type='module', mo
         'module_shape': module_shape
     })
     # Allows for sending of larger images.
+    if image.shape[0] > 5000 or image.shape[1] > 5000:
+        image = cv2.resize(image, [image.shape[1]//2, image.shape[0]//2])
     with BytesIO() as buf:
         buf.write(cv2.imencode('.jpeg', image)[1])
         model_output = requests.post(url=f'{API_IP}/image_inference', files={'image': buf.getvalue(), 'json_data': ('filename', meta_data, 'application/json')})
@@ -76,9 +78,12 @@ def inference_pipeline(image, username, module_shape=None, img_type='module', mo
             # Modify to handle error differently.
             print(model_output.text)
             return
-
-    # Above is all you need for the request. Below is combining everything for print and display.
     
+    return model_output
+
+
+def display_output(image, model_output, module_shape=None, img_type='module'):
+    # Above is all you need for the request. Below is combining everything for print and display.
     if img_type == 'module':
         total_defective_area = np.zeros(4)
         # module = np.array(model_output['module'])
